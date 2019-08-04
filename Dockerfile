@@ -7,4 +7,4 @@ RUN bundle install --jobs 4
 
 COPY . .
 
-EXPOSE 80
+ENTRYPOINT ["/usr/local/bin/bundle", "exec", "ruby", "main.rb"]
