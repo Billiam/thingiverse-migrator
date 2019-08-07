@@ -20,7 +20,7 @@ module Thingiverse
 
       api_data['ancestors'] = fetch("#{full_path}/ancestors")
       api_data['files'] = fetch("#{full_path}/files")
-      api_data['category'] = fetch("#{full_path}/category")
+      api_data['category'] = Array(fetch("#{full_path}/categories")).first
       api_data['tags'] = fetch("#{full_path}/tags")
 
       api_data.merge(scrape)
