@@ -3,7 +3,9 @@ require 'bundler/setup'
 
 require 'dotenv/load'
 
-$LOAD_PATH.unshift(File.expand_path("lib", __dir__))
+APP_ROOT = Pathname.new(File.expand_path(__dir__))
+
+$LOAD_PATH.unshift(APP_ROOT.join('lib'))
 
 require 'thingiverse'
 

@@ -1,4 +1,5 @@
 .env
+!.gitkeep
 
 things/*
-!things/.gitkeep
+cookie_jar/*
