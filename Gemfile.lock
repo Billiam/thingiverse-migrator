@@ -3,6 +3,8 @@ GEM
   specs:
     addressable (2.6.0)
       public_suffix (>= 2.0.2, < 4.0)
+    childprocess (1.0.1)
+      rake (< 13.0)
     domain_name (0.5.20190701)
       unf (>= 0.0.5, < 1.0.0)
     dotenv (2.7.5)
@@ -19,9 +21,18 @@ GEM
     nokogiri (1.10.3)
       mini_portile2 (~> 2.4.0)
     public_suffix (3.1.1)
+    rake (12.3.3)
+    regexp_parser (1.6.0)
+    rubyzip (1.2.3)
+    selenium-webdriver (3.142.3)
+      childprocess (>= 0.5, < 2.0)
+      rubyzip (~> 1.2, >= 1.2.2)
     unf (0.1.4)
       unf_ext
     unf_ext (0.0.7.6)
+    watir (6.16.5)
+      regexp_parser (~> 1.2)
+      selenium-webdriver (~> 3.6)
 
 PLATFORMS
   ruby
@@ -30,6 +41,7 @@ DEPENDENCIES
   dotenv
   http
   nokogiri
+  watir
 
 BUNDLED WITH
    1.17.2
