@@ -40,6 +40,9 @@ will not be saved, but the resulting cookies will be. These are created and stor
 `cookie_jar/prusa_auth.ym/`, and can be deleted when you're done.
 4. Because of the lack of an API, the authentication and upload code are very fragile, and
 will not be maintained indefinitely.
+5. PrusaPrinter's bulleted and ordered list markdown isn't parsed correctly.
+6. PrusaPrinter does not have a way to upload inline images for print instruction steps, so these are not handled during
+migration.
 
 ### I understand
 Run: `bin/run.sh resore`  

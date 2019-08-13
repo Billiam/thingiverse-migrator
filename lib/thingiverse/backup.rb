@@ -42,7 +42,13 @@ module Thingiverse
           [file['name'], file['public_url']]
         end
 
-        downloads.concat files
+        step_images = thing_data['details_parts'].flat_map do |section|
+          section['data']&.flat_map do |subsection|
+            subsection['image']
+          end
+        end.compact
+
+        downloads.concat files, step_images
 
         puts "Downloading #{downloads.count} files for #{thing}" if downloads.any?
         downloads.each do |filename, url|
