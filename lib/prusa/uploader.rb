@@ -157,7 +157,7 @@ module Prusa
           )
         end.join("\n")
 
-        description += "\n\n ### Remixed From: \n\n#{remix_markdown}"
+        description += "\n\n### Remixed From: \n\n#{remix_markdown}"
       end
 
       description
@@ -171,12 +171,32 @@ module Prusa
 
     end
 
+    def instructions
+      parsed_json['details_parts'].reject do |section|
+        section['type'] == 'summary'
+      end.flat_map do |section|
+        Array(section['data']).map do |subsection|
+          content = subsection['notes'] || subsection['content']
+
+          next unless content
+
+          title = subsection['title']
+          if title
+            content = "## #{title.sub('Post-processing (optional)', 'Post-processing')}\n\n#{content}"
+          end
+
+          content
+        end
+      end.compact.join("\n\n")
+    end
+
     def run
       session.goto 'https://prusaprinters.org/print/create'
 
       session.text_field(id: 'print-name').set parsed_json['name']
       session.textarea(id: 'summary').set summary
       session.select_list(id: 'category').select mapped_category
+      session.textarea(id: 'content').set instructions
 
       tag_string = tags
       unless tag_string.empty?

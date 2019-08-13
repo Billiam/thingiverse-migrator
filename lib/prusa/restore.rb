@@ -13,7 +13,11 @@ module Prusa
       user_id = session.user_id
       existing_uploads = Prusa::User.new(user_id, session.session).prints.keys.map(&:strip)
 
-      Dir.glob(@directory.join('*')).each do |directory|
+      directories = Dir.glob(@directory.join('*')).sort_by do |directory|
+        File.basename(directory).to_i
+      end
+
+      directories.each do |directory|
         uploader = Prusa::Uploader.new(directory, session.session)
         if existing_uploads.include? uploader.name.strip
           # assume already uploaded
@@ -21,8 +25,12 @@ module Prusa
         else
           puts %Q[Uploading "#{uploader.name}"]
           uploader.run
-          puts "Done, waiting between uploads"
-          sleep(10)
+          puts "Done"
+
+          unless directory == directories.last
+            puts "Waiting between uploads"
+            sleep(10)
+          end
         end
       end
     end
