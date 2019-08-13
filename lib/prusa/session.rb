@@ -22,7 +22,7 @@ module Prusa
 
     def with_screenshot
       yield session
-    rescue Watir::Exception::UnknownObjectException
+    rescue Watir::Exception::UnknownObjectException, Watir::Wait::TimeoutError
       session.driver.save_screenshot(@screenshot_path.join(Time.now.strftime("%Y%m%d-%H%M%S.png"))) if @screenshot_path
 
       raise

@@ -105,7 +105,7 @@ module Prusa
     def self.check_license(license)
       return if @warned_license
 
-      if WARNING_LICENSE.include? thing_license
+      if WARNING_LICENSE.include? license
         puts "Some projects use licenses not supported by PrusaPrinters (BSD or GPL)"
         puts "If you continue, these will be created as Creative Commons - Attribution - Share Alike"
         puts "Do you wish to continue with this change? [y/N]"
@@ -120,9 +120,10 @@ module Prusa
       end
     end
 
-    def initialize(path, session)
+    def initialize(path, session, publish=false)
       @path = Pathname.new(File.expand_path(path))
       @session = session
+      @publish = publish
     end
 
     def name
@@ -130,13 +131,13 @@ module Prusa
     end
 
     def mapped_category
-      CATEGORY_MAP[parsed_json['category']['name'].strip]
+      CATEGORY_MAP.fetch(parsed_json['category']['name'].strip)
     end
 
     def mapped_license
       thing_license = parsed_json['license'].strip
       self.class.check_license(thing_license)
-      LICENSE_MAP[thing_license]
+      LICENSE_MAP.fetch(thing_license)
     end
 
     def summary
@@ -202,6 +203,10 @@ module Prusa
       end.compact.join("\n\n")
     end
 
+    def publish?
+      @publish && parsed_json['is_published'] &&  !parsed_json['is_private']
+    end
+
     def run
       @session.with_screenshot do |session|
         license = mapped_license
@@ -222,18 +227,34 @@ module Prusa
 
         puts "Uploading files"
         asset_list.each do |asset|
+          print "."
           session.file_field(id: 'file-upload-input').set asset
           session.wait_until { session.div(class_name: 'progress-bar').exists? }
           session.wait_until { !session.div(class_name: 'progress-bar').exists? }
-          print "."
           sleep 3 unless asset == asset_list.last
         end
         puts ""
 
-        session.select_list(id: 'license').select license
+        license_select = session.select_list(id: 'license')
+        license_select.select license
+        session.wait_until do
+          license_select.selected_options.map(&:text).include? license
+        end
 
-        session.
-        session.button(text: 'Save draft').click
+        if publish?
+          if !session.button(text: 'Publish now').exists?
+            session.div(class_name: 'form-check-switch').span(text: 'Published').click
+          end
+          session.button(text: 'Publish now').click
+        else
+          session.button(text: 'Save draft').click
+        end
+
+        edit_url = session.url
+
+        session.wait_until do
+          session.url != edit_url
+        end
       end
     end
 

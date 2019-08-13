@@ -4,9 +4,11 @@ require 'prusa/uploader'
 
 module Prusa
   class Restore
-    def initialize(directory, screenshot=false)
+    def initialize(directory, publish: false, screenshot: false, limit: 0)
       @directory = directory
       @screenshot = screenshot
+      @limit = limit
+      @publish = publish
     end
 
     def run
@@ -17,25 +19,31 @@ module Prusa
       user_id = session.user_id
       existing_uploads = Prusa::User.new(user_id, session).prints.keys.map(&:strip)
 
-      directories = Dir.glob(@directory.join('*')).sort_by do |directory|
+      uploaders = Dir.glob(@directory.join('*')).sort_by do |directory|
         File.basename(directory).to_i
-      end.first(5)
-
-      directories.each do |directory|
-        uploader = Prusa::Uploader.new(directory, session)
+      end.lazy.map do |directory|
+        uploader = Prusa::Uploader.new(directory, session, @publish)
         if existing_uploads.include? uploader.name.strip
-          # assume already uploaded
           puts %Q[Skipping "#{uploader.name}"]
-        else
-          puts %Q[Uploading "#{uploader.name}"]
-          uploader.run
-          puts "Done"
-
-          unless directory == directories.last
-            puts "Waiting between uploads"
-            sleep(10)
-          end
+          next
         end
+
+        uploader
+      end.reject(&:nil?)
+
+      if @limit
+        uploaders = uploaders.take(@limit)
+      end
+
+      uploaders.each.with_index do |uploader, index|
+        if index > 0
+          puts "Waiting between uploads"
+          sleep(10)
+        end
+
+        puts %Q[Uploading "#{uploader.name}"]
+        uploader.run
+        puts "Done uploading #{uploader.name}"
       end
     end
   end

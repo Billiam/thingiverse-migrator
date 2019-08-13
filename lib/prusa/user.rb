@@ -6,6 +6,8 @@ module Prusa
     end
 
     def prints
+      puts "Looking for existing uploads"
+
       @session.with_screenshot do |session|
         session.goto(format('https://www.prusaprinters.org/social/%s/prints', @user_id))
         # Load all drafts
@@ -15,12 +17,13 @@ module Prusa
         end
 
         loader = session.element(css: 'load-more-infinity')
-        while !(loader.text =~ /all prints loaded/i || loader.text =~ /no prints found/i)
+
+        wait_condition = ->(text) { text =~ /load more/i || text =~ /all prints loaded/i || text.strip.empty? }
+
+        while !wait_condition.call(loader.text)
           session.scroll.to(:bottom)
           session.wait_until do
-            text = loader.text
-
-            text =~ /load more/i || text =~ /all prints loaded/i
+            wait_condition.call(loader.text)
           end
         end
 
