@@ -2,8 +2,6 @@ require 'json'
 
 module Prusa
   class Uploader
-    attr_reader :session
-
     CATEGORY_MAP = {
       '3D Printing'            => 'Other Accessories',
       '3D Printer Accessories' => 'Other Accessories',
@@ -167,8 +165,22 @@ module Prusa
       parsed_json['tags'].map { |tag| tag['name'].gsub(/[^a-z0-9]/i, '') }.compact.reject(&:empty?).join(' ')
     end
 
+    # create sorted uploads list
     def upload_paths
+      image_names = parsed_json['images'].map do |url|
+        URI.parse(url).path.split('/').last
+      end
 
+      file_names = parsed_json['files'].map do |file|
+        file['name']
+      end
+      (image_names + file_names).map do |name|
+        file_path = @path.join(name)
+
+        next unless File.readable?(file_path)
+
+        file_path
+      end.compact
     end
 
     def instructions
@@ -191,19 +203,38 @@ module Prusa
     end
 
     def run
-      session.goto 'https://prusaprinters.org/print/create'
+      @session.with_screenshot do |session|
+        license = mapped_license
 
-      session.text_field(id: 'print-name').set parsed_json['name']
-      session.textarea(id: 'summary').set summary
-      session.select_list(id: 'category').select mapped_category
-      session.textarea(id: 'content').set instructions
+        session.goto 'https://prusaprinters.org/print/create'
 
-      tag_string = tags
-      unless tag_string.empty?
-        session.input(css: 'print-tags form input').wd.send_keys "#{tag_string} "
+        session.text_field(id: 'print-name').set parsed_json['name']
+        session.textarea(id: 'summary').set summary
+        session.select_list(id: 'category').select mapped_category
+        session.textarea(id: 'content').set instructions
+
+        tag_string = tags
+        unless tag_string.empty?
+          session.input(css: 'print-tags form input').wd.send_keys "#{tag_string} "
+        end
+
+        asset_list = upload_paths
+
+        puts "Uploading files"
+        asset_list.each do |asset|
+          session.file_field(id: 'file-upload-input').set asset
+          session.wait_until { session.div(class_name: 'progress-bar').exists? }
+          session.wait_until { !session.div(class_name: 'progress-bar').exists? }
+          print "."
+          sleep 3 unless asset == asset_list.last
+        end
+        puts ""
+
+        session.select_list(id: 'license').select license
+
+        session.
+        session.button(text: 'Save draft').click
       end
-
-      session.button(text: 'Save draft').click
     end
 
     private

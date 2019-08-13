@@ -27,13 +27,14 @@ class Migrator < Thor
 
   desc "restore", "Restore backed up data to new service"
   option :service, default: 'prusaprinters', enum: %w(prusaprinters)
+  option :screenshot, required: false, type: :boolean, default: false, desc: "Save screenshots during request timeouts"
   def restore
     service = options[:service]
 
     if service == 'prusaprinters'
       require 'prusa'
 
-      Prusa::Restore.new(APP_ROOT.join('things')).run
+      Prusa::Restore.new(APP_ROOT.join('things'), screenshot: options[:screenshot]).run
     end
   end
 end

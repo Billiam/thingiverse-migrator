@@ -2,8 +2,9 @@ require 'watir'
 
 module Prusa
   class Session
-    def initialize(cookie_path = nil)
+    def initialize(cookie_path = nil, screenshot_path)
       @cookie_path = cookie_path
+      @screenshot_path = screenshot_path
     end
 
     def session
@@ -17,6 +18,14 @@ module Prusa
 
         session
       end
+    end
+
+    def with_screenshot
+      yield session
+    rescue Watir::Exception::UnknownObjectException
+      session.driver.save_screenshot(@screenshot_path.join(Time.now.strftime("%Y%m%d-%H%M%S.png"))) if @screenshot_path
+
+      raise
     end
 
     def user_id(is_retry=false)
