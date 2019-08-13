@@ -9,7 +9,13 @@ module Prusa
 
     def prints
       session.goto(format('https://www.prusaprinters.org/social/%s/prints', @user_id))
+      # Load all drafts
+      draft_loader = session.element(class: 'load-more-drafts')
+      while draft_loader.text =~ /load more drafts/i
+        draft_loader.button(class: 'btn').click
+      end
 
+      # Load all public prints
       loader = session.element(css: 'load-more-infinity')
       while !(loader.text =~ /all prints loaded/i || loader.text =~ /no prints found/i)
         session.scroll.to(:bottom)
