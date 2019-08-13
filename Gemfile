@@ -6,3 +6,4 @@ gem "dotenv"
 gem 'http'
 gem 'nokogiri'
 gem 'watir'
+gem 'thor'

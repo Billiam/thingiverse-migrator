@@ -9,6 +9,7 @@ module Prusa
     def session
       @session ||= begin
         session = Watir::Browser.new :chrome, headless: true, options: { args: ['--disable-gpu', '--no-sandbox'] }
+        puts "Setting up session"
         session.goto 'https://www.prusaprinters.org'
         restore_cookies(session)
         session.goto 'https://auth.prusaprinters.org'
@@ -38,6 +39,8 @@ module Prusa
     end
 
     def login
+      puts "Logging in"
+
       session.button(text: /Login/).click
 
       session.wait_until do
