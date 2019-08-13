@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-set -ev
+set -e
 
 if [[ "$(docker images -q thingiverse 2> /dev/null)" == "" ]]; then
   docker build . -t thingiverse
