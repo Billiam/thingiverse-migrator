@@ -13,8 +13,7 @@ module Prusa
       user_id = session.user_id
       existing_uploads = Prusa::User.new(user_id, session.session).prints.keys.map(&:strip)
 
-      Dir.glob(@directory.join('*')).first(3).each do |directory|
-
+      Dir.glob(@directory.join('*')).each do |directory|
         uploader = Prusa::Uploader.new(directory, session.session)
         if existing_uploads.include? uploader.name.strip
           # assume already uploaded
