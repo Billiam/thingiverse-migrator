@@ -4,7 +4,7 @@
 ## Features
 
 * Download your projects from Thingiverse, including most metadata, original images and model files.
-* Generate images from stl and scad files so that projects can look nice on sites which do not generate them for you. ([example](assets/render.png))
+* Generate images from stl and scad files so that projects can look nice on sites which do not generate them for you. [<img src="https://github.com/Billiam/thingiverse-migrator/raw/master/assets/render.png" width=100>](https://github.com/Billiam/thingiverse-migrator/raw/master/assets/render.png)
 * Upload your projects to another host (currently only PrusaPrinters supported, and that just barely, see caveats below).
 
 Output example: https://www.prusaprinters.org/social/23599/prints
