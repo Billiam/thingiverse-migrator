@@ -41,7 +41,7 @@ module Prusa
           sleep(10)
         end
 
-        puts %Q[Uploading "#{uploader.name}"]
+        puts %Q[Creating "#{uploader.name}"]
         uploader.run
         puts "Done uploading #{uploader.name}"
       end
