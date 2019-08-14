@@ -135,8 +135,8 @@ module Prusa
       end
     end
 
-    def rendered_images?
-      Array(@json['migrator_renders']).any?
+    def renders?
+      renders.any?
     end
 
     def stls
@@ -190,17 +190,7 @@ module Prusa
     # create sorted uploads list
     def upload_paths
       @paths ||= begin
-        image_names = @json['images'].map do |url|
-          URI.parse(url).path.split('/').last
-        end
-
-        file_names = @json['files'].map do |file|
-          file['name']
-        end
-
-        renders = Array(@json['migrator_renders'])
-
-        (image_names + file_names + renders).map do |name|
+        (images + files + renders).map do |name|
           file_path = @directory.join(name)
 
           next unless File.readable?(file_path)
@@ -208,6 +198,22 @@ module Prusa
           file_path
         end.compact
       end
+    end
+
+    def images
+      @json['images'].map do |url|
+        URI.parse(url).path.split('/').last
+      end
+    end
+
+    def files
+      @json['files'].map do |file|
+        file['name']
+      end
+    end
+
+    def renders
+      Array(@json['migrator_renders'])
     end
 
     def renders=(renders)

@@ -1,8 +1,9 @@
 module Prusa
   class Screenshot
-    def initialize(path, render_all=false)
+    def initialize(path, limit:, which:)
       @path = path
-      @render_all = render_all
+      @limit = limit
+      @filter_projects = which
     end
 
     def run
@@ -13,30 +14,39 @@ module Prusa
       end.each do |folder|
         parser = Prusa::Parser.new(folder.join("#{folder.basename}.json"))
 
-        next if parser.rendered_images?
-
-        if @render_all
-          files = (parser.scads + parser.stls)
-        else
-          if parser.has_image?
-            next
-          end
-          files = (parser.scads + parser.stls).first(1)
+        if @filter_projects == 'empty'
+          next if parser.images.any?
         end
 
-        rendered_files = files.map do |file|
-          render(file).basename.to_s
+        files = (parser.scads + parser.stls)
+
+        output_files = files.map do |file|
+          [file.basename.sub_ext(file.extname + '.render.png').to_s, file]
+        end.to_h
+
+        # already_rendered = parser.renders
+        already_rendered = []
+        to_render = output_files.keys - already_rendered
+
+        if @limit > 0
+          count_to_render = [0, @limit - already_rendered.count].max
+          to_render = to_render.first(count_to_render)
         end
 
-        parser.renders = rendered_files
-        parser.save
+        to_render.each do |output_name|
+          render(output_files[output_name], folder.join(output_name))
+        end
+
+        if to_render.any?
+          parser.renders = (already_rendered + to_render)
+
+          parser.save
+        end
       end
     end
 
-    def render(file)
+    def render(file, output_file)
       puts "Rendering #{file.dirname.basename.join(file.basename)}"
-
-      output_file = file.sub_ext(file.extname + '.render.png')
 
       options = ['--colorscheme', 'Nature', '-o', output_file.to_s, '--imgsize=1280,960']
 
@@ -46,8 +56,6 @@ module Prusa
       else
         system 'xvfb-run', '-a', 'openscad', file.to_s, *options
       end
-
-      output_file
     end
   end
 end

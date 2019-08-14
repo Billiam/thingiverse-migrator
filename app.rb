@@ -43,10 +43,11 @@ class Migrator < Thor
   end
 
   desc "render_objects", "Generate stl and scad images for projects with no images"
-  option :all, required: false, type: :boolean, default: false, desc: "Generate images for all stl and scad files, even when there are existing images"
+  option :which, required: false, enum: %w(empty all), default: 'empty', desc: "Which projects should have images generated. Empty: only projects with no images. All: All projects"
+  option :limit, required: false, type: :numeric, default: 0, desc: "Maximum number of images to create per project. Default 0 (unlimited)"
   def render_objects
     require 'prusa'
 
-    Prusa::Screenshot.new(APP_ROOT.join('things'), options[:all]).run
+    Prusa::Screenshot.new(APP_ROOT.join('things'), limit: options[:limit], which: options[:which]).run
   end
 end
