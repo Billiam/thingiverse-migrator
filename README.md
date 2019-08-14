@@ -11,7 +11,7 @@ Output example: https://www.prusaprinters.org/social/23599/prints
 
 ## Usage
 
-### Setup and backing up your Thingiverse data
+### Project setup
 
 1. Install Docker.
 
@@ -23,25 +23,21 @@ Output example: https://www.prusaprinters.org/social/23599/prints
 This will generate an access token, client id and client secret.  
 The access token does not have user permissions, and can only access public items.  
 <br>If that's all you need, skip to step 2.
-
     1. If you want to fetch unpublished items as well, you'll need to create an access token for your Thingiverse user.  
-    You'll need your client secret from the Thingiverse application you created.
+  You'll need your client secret from the Thingiverse application you created.
     2. Visit: https://www.thingiverse.com/login/oauth/authorize?client_id=YOUR_CLIENT_SECRET&redirect_uri=http%3A%2F%2Flocalhost%3A9999&response_type=token
-    3. Sign in, authorize your application, and copy the `access_token` parameter from the url 
-when you're redirected back to localhost.
-
+    3. Sign in, authorize your application, and copy the `access_token` parameter from the url when you're redirected back to localhost.
 2. Run: `bin/run.sh backup <your thingiverse name>`
+ This will download your Thingiverse uploads to the `things` directory
 
-    This will download your Thingiverse uploads to the `things` directory
 
-
-### Render images for STL and scad files
+### Render images for STL and SCAD files
 
 Some 3D object repositories (like PrusaPrinters.org) do not automatically render STL and SCAD files,
 and will instead show a default placeholder image if you do not add your own images.
 
-Optionally, you can generate an image for each project in your `things` which does not appear to have an image 
-by running
+Optionally, you can generate an image for each project in your `things` directory which does not appear to have an image 
+by running:
 
 `bin/run.sh render_objects`
 
@@ -57,16 +53,17 @@ Currently only PrusaPrinters.org is supported, and that only tentatively.
 please make sure you understand them before continuing.
 
 ### Caveats
+
 1. PrusaPrinters does not support all of the licenses that Thingiverse does. Any projects
-you've created which use GPL or BSD licenses will use a creative commons license instead (CC BY-SA).
+you've created which use GPL or BSD licenses will use a Creative Commons license instead (CC BY-SA).
 This license is _not_ equivalent.
 2. Thingiverse has more categories. I've made some best guesses about how these should map to 
 PrusaPrinters' categories. [Pull requests to change this mapping are welcome](lib/prusa/uploader.rb).  
 Tags are added as-is, without any translation.
 3. You will be prompted to provide your PrusaPrinters.org username and password directly. There is no available
-api currently, so all uploads and item creation take place in a headless browser. Your username and password
+API currently, so all uploads and item creation take place in a headless browser. Your username and password
 will not be saved, but the resulting cookies will be. These are created and stored in`cookie_jar/prusa.yml` and 
-`cookie_jar/prusa_auth.ym/`, and can be deleted when you're done.
+`cookie_jar/prusa_auth.ym`, and can be deleted when you're done.
 4. Because of the lack of an API, the authentication and upload code are very fragile, and
 will not be maintained indefinitely.
 5. PrusaPrinters' bulleted and ordered list markdown isn't parsed correctly.
