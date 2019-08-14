@@ -20,6 +20,8 @@ class Migrator < Thor
 
     require 'thingiverse'
 
+    Thingiverse.connection = Thingiverse::Connection.new(ENV['ACCESS_TOKEN'])
+
     output_directory = APP_ROOT.join('things')
 
     Thingiverse::Backup.new(name, output_directory).run
@@ -38,5 +40,13 @@ class Migrator < Thor
 
       Prusa::Restore.new(APP_ROOT.join('things'), publish: options[:publish], screenshot: options[:screenshot], limit: options[:limit]).run
     end
+  end
+
+  desc "render_objects", "Generate stl and scad images for projects with no images"
+  option :all, required: false, type: :boolean, default: false, desc: "Generate images for all stl and scad files, even when there are existing images"
+  def render_objects
+    require 'prusa'
+
+    Prusa::Screenshot.new(APP_ROOT.join('things'), options[:all]).run
   end
 end

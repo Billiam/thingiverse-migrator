@@ -1,9 +1,23 @@
-## Setup and backing up your Thingiverse data
+# Thingiverse Migrator
+![Push it over there](assets/patrick.jpg)
+
+## Features
+
+* Download your projects from Thingiverse, including most metadata, original images and model files.
+* Generate images from stl and scad files so that projects can look nice on sites which do not generate them for you. ([example](assets/render.png))
+* Upload your projects to another host (currently only PrusaPrinters supported, and that just barely, see caveats below).
+
+Output example: https://www.prusaprinters.org/social/23599/prints
+
+## Usage
+
+### Setup and backing up your Thingiverse data
+
 1. Install Docker.
 
 2. Copy `dotenv-dist` to `.env`.
 
-## Back up your Thingiverse data
+### Back up your Thingiverse data
 
 1. Create a Thingiverse desktop API application: https://www.thingiverse.com/apps/create/  
 This will generate an access token, client id and client secret.  
@@ -20,7 +34,22 @@ when you're redirected back to localhost.
 
     This will download your Thingiverse uploads to the `things` directory
 
-## Migrating uploads to a new location
+
+### Render images for STL and scad files
+
+Some 3D object repositories (like PrusaPrinters.org) do not automatically render STL and SCAD files,
+and will instead show a default placeholder image if you do not add your own images.
+
+Optionally, you can generate an image for each project in your `things` which does not appear to have an image 
+by running
+
+`bin/run.sh render_objects`
+
+You may instead render all STL and SCAD files by running
+
+`bin/run.sh render_objects --all`
+
+### Migrating uploads to a new location
 
 Currently only PrusaPrinters.org is supported, and that only tentatively.
 
@@ -32,7 +61,7 @@ please make sure you understand them before continuing.
 you've created which use GPL or BSD licenses will use a creative commons license instead (CC BY-SA).
 This license is _not_ equivalent.
 2. Thingiverse has more categories. I've made some best guesses about how these should map to 
-PrusaPrinter's categories. [Pull requests to change this mapping are welcome](lib/prusa/uploader.rb).  
+PrusaPrinters' categories. [Pull requests to change this mapping are welcome](lib/prusa/uploader.rb).  
 Tags are added as-is, without any translation.
 3. You will be prompted to provide your PrusaPrinters.org username and password directly. There is no available
 api currently, so all uploads and item creation take place in a headless browser. Your username and password
@@ -40,10 +69,15 @@ will not be saved, but the resulting cookies will be. These are created and stor
 `cookie_jar/prusa_auth.ym/`, and can be deleted when you're done.
 4. Because of the lack of an API, the authentication and upload code are very fragile, and
 will not be maintained indefinitely.
-5. PrusaPrinter's bulleted and ordered list markdown isn't parsed correctly.
-6. PrusaPrinter does not have a way to upload inline images for print instruction steps, so these are not handled during
+5. PrusaPrinters' bulleted and ordered list markdown isn't parsed correctly.
+6. PrusaPrinters does not have a way to upload inline images for print instruction steps, so these are not handled during
 migration.
+7. PrusaPrinters uses a different image aspect ratio than Thingiverse, and handles it by cropping to width, which may 
+not look ideal for tall images.
 
-### I understand
+#### I understand
+
 Run: `bin/run.sh resore`  
 Enter your username and password when prompted.
+
+See `bin/run.sh help restore` for usage and options.

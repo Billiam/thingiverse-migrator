@@ -8,7 +8,7 @@ RUN echo "deb http://dl.google.com/linux/chrome/deb/ stable main" > /etc/apt/sou
 # Install basic tools
 RUN apt-get update \
   && apt-get install -q -y lsof unzip wget tar openssl xvfb \
-  && apt-get install -q -y google-chrome-stable \
+    openscad google-chrome-stable \
   && rm -rf /var/lib/apt/lists/*
 
 RUN wget -nv https://chromedriver.storage.googleapis.com/76.0.3809.68/chromedriver_linux64.zip -O /tmp/chromedriver_linux64.zip \

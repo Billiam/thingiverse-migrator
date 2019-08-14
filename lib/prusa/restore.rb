@@ -31,7 +31,7 @@ module Prusa
         uploader
       end.reject(&:nil?)
 
-      if @limit
+      if @limit > 0
         uploaders = uploaders.take(@limit)
       end
 
