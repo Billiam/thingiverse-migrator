@@ -40,7 +40,9 @@ module Prusa
           print "."
           session.file_field(id: 'file-upload-input').set asset
           session.wait_until { session.div(class_name: 'progress-bar').exists? }
-          session.wait_until { !session.div(class_name: 'progress-bar').exists? }
+          session.wait_until(timeout: 120, message: "File: #{asset.dirname.join(asset.basename)} could not be uploaded in 120 seconds") do
+            !session.div(class_name: 'progress-bar').exists?
+          end
           sleep 3 unless asset == asset_list.last
         end
         puts ""
