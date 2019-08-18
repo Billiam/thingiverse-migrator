@@ -1,0 +1,23 @@
+<!doctype html>
+
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+
+  <title>MyMiniFactory</title>
+  <meta name="robots" content="noindex">
+
+</head>
+
+<body>
+  <div id="Access code"></div>
+  <script>
+document.addEventListener("DOMContentLoaded", function(event) {
+  var urlParams = new URLSearchParams(window.location.search);
+  if (urlParams.has('code') {
+    document.getElementById('access_code').appendChild(document.createTextNode('Auth succeeded, use MYMINIFACTORY_ACCESS_CODE=' + urlParams.get('code') + ' to your .env file'));
+  }
+});
+  </script>
+</body>
+</html>
